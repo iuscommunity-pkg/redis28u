@@ -123,6 +123,12 @@ You can use Redis from most programming languages also.
     DEBUG="" \
     LDFLAGS="%{?__global_ldflags}" \
     CFLAGS+="%{optflags}" \
+%if 0%{?rhel} <= 5
+%ifarch %{ix86}
+    # https://github.com/antirez/redis/issues/753
+    CFLAGS+=" -march=i686" \
+%endif
+%endif
     LUA_LDFLAGS+="%{?__global_ldflags}" \
     MALLOC=jemalloc \
     all
