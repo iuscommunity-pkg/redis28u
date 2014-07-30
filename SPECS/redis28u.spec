@@ -1,5 +1,5 @@
 %global real_name redis
-%global ius_suffix 30u
+%global ius_suffix 28u
 
 # redis 2.8 sentinel is the first upstream version to work
 # however as packaged here it is entirely broken
