@@ -97,7 +97,7 @@ You can use Redis from most programming languages also.
 
 %prep
 %setup -q -n %{real_name}-%{version}
-rm -frv deps/jemalloc
+%{__rm} -frv deps/jemalloc
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -106,20 +106,20 @@ rm -frv deps/jemalloc
 %endif
 
 # No hidden build.
-sed -i -e 's|\t@|\t|g' deps/lua/src/Makefile
-sed -i -e 's|$(QUIET_CC)||g' src/Makefile
-sed -i -e 's|$(QUIET_LINK)||g' src/Makefile
-sed -i -e 's|$(QUIET_INSTALL)||g' src/Makefile
+%{__sed} -i -e 's|\t@|\t|g' deps/lua/src/Makefile
+%{__sed} -i -e 's|$(QUIET_CC)||g' src/Makefile
+%{__sed} -i -e 's|$(QUIET_LINK)||g' src/Makefile
+%{__sed} -i -e 's|$(QUIET_INSTALL)||g' src/Makefile
 # Ensure deps are built with proper flags
-sed -i -e 's|$(CFLAGS)|%{optflags}|g' deps/Makefile
-sed -i -e 's|OPTIMIZATION?=-O3|OPTIMIZATION=%{optflags}|g' deps/hiredis/Makefile
-sed -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/hiredis/Makefile
-sed -i -e 's|$(CFLAGS)|%{optflags}|g' deps/linenoise/Makefile
-sed -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/linenoise/Makefile
+%{__sed} -i -e 's|$(CFLAGS)|%{optflags}|g' deps/Makefile
+%{__sed} -i -e 's|OPTIMIZATION?=-O3|OPTIMIZATION=%{optflags}|g' deps/hiredis/Makefile
+%{__sed} -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/hiredis/Makefile
+%{__sed} -i -e 's|$(CFLAGS)|%{optflags}|g' deps/linenoise/Makefile
+%{__sed} -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/linenoise/Makefile
 
 
 %build
-make %{?_smp_mflags} \
+%{__make} %{?_smp_mflags} \
     DEBUG="" \
     LDFLAGS="%{?__global_ldflags}" \
     CFLAGS+="%{optflags}" \
@@ -130,41 +130,41 @@ make %{?_smp_mflags} \
 
 %install
 %{?el5:%{__rm} -rf %{buildroot}}
-make install INSTALL="install -p" PREFIX=%{buildroot}%{_prefix}
+%{__make} install INSTALL="install -p" PREFIX=%{buildroot}%{_prefix}
 
 # Filesystem.
-install -d %{buildroot}%{_sharedstatedir}/%{real_name}
-install -d %{buildroot}%{_localstatedir}/log/%{real_name}
-install -d %{buildroot}%{_localstatedir}/run/%{real_name}
+%{__install} -d %{buildroot}%{_sharedstatedir}/%{real_name}
+%{__install} -d %{buildroot}%{_localstatedir}/log/%{real_name}
+%{__install} -d %{buildroot}%{_localstatedir}/run/%{real_name}
 
 # Install logrotate file.
-install -pDm644 %{S:1} %{buildroot}%{_sysconfdir}/logrotate.d/%{real_name}
+%{__install} -pDm644 %{S:1} %{buildroot}%{_sysconfdir}/logrotate.d/%{real_name}
 
 # Install configuration files.
-install -pDm644 %{real_name}.conf %{buildroot}%{_sysconfdir}/%{real_name}.conf
+%{__install} -pDm644 %{real_name}.conf %{buildroot}%{_sysconfdir}/%{real_name}.conf
 %if 0%{?with_sentinel}
-install -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/%{real_name}-sentinel.conf
+%{__install} -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/%{real_name}-sentinel.conf
 %endif
 
 # Install Systemd/SysV files.
 %if 0%{?with_systemd}
-mkdir -p %{buildroot}%{_unitdir}
-install -pm644 %{S:3} %{buildroot}%{_unitdir}
+%{__mkdir} -p %{buildroot}%{_unitdir}
+%{__install} -pm644 %{S:3} %{buildroot}%{_unitdir}
 %if 0%{?with_sentinel}
-install -pm644 %{S:2} %{buildroot}%{_unitdir}
+%{__install} -pm644 %{S:2} %{buildroot}%{_unitdir}
 %endif
 
 # Install systemd tmpfiles config.
-install -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/%{real_name}.conf
+%{__install} -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/%{real_name}.conf
 %else
 %if 0%{?with_sentinel}
-install -pDm755 %{S:5} %{buildroot}%{_initrddir}/%{real_name}-sentinel
+%{__install} -pDm755 %{S:5} %{buildroot}%{_initrddir}/%{real_name}-sentinel
 %endif
-install -pDm755 %{S:6} %{buildroot}%{_initrddir}/%{real_name}
+%{__install} -pDm755 %{S:6} %{buildroot}%{_initrddir}/%{real_name}
 %endif
 
 # Fix non-standard-executable-perm error.
-chmod 755 %{buildroot}%{_bindir}/%{real_name}-*
+%{__chmod} 755 %{buildroot}%{_bindir}/%{real_name}-*
 
 
 %{?el5:%clean}
@@ -173,9 +173,9 @@ chmod 755 %{buildroot}%{_bindir}/%{real_name}-*
 
 %check
 %if 0%{?with_tests}
-make test
+%{__make} test
 %if 0%{?with_sentinel}
-make test-sentinel
+%{__make} test-sentinel
 %endif
 %endif
 
