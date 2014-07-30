@@ -1,7 +1,5 @@
 %global _hardened_build 1
 
-%global with_perftools 0
-
 # redis 2.8 sentinel is the first upstream version to work
 # however as packaged here it is entirely broken
 # FIXME: consider removal into a separate package
@@ -41,11 +39,7 @@ Patch1:            redis-2.8.11-deps-library-fPIC-performance-tuning.patch
 Patch2:            redis-2.8.11-use-system-jemalloc.patch
 # tests/integration/replication-psync.tcl failed on slow machines(GITHUB #1417)
 Patch3:            redis-2.8.11-disable-test-failed-on-slow-machine.patch
-%if 0%{?with_perftools}
-BuildRequires:     gperftools-devel
-%else
 BuildRequires:     jemalloc-devel
-%endif
 %if 0%{?with_tests}
 BuildRequires:     procps-ng
 %endif
@@ -121,11 +115,7 @@ make %{?_smp_mflags} \
     LDFLAGS="%{?__global_ldflags}" \
     CFLAGS+="%{optflags}" \
     LUA_LDFLAGS+="%{?__global_ldflags}" \
-%if 0%{?with_perftools}
-    MALLOC=tcmalloc \
-%else
     MALLOC=jemalloc \
-%endif
     all
 
 %install
