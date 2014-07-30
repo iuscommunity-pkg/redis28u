@@ -119,13 +119,14 @@ You can use Redis from most programming languages also.
 
 
 %build
+# the if statement below is in reference to this issue
+# https://github.com/antirez/redis/issues/753
 %{__make} %{?_smp_mflags} \
     DEBUG="" \
     LDFLAGS="%{?__global_ldflags}" \
     CFLAGS+="%{optflags}" \
 %if 0%{?rhel} <= 5
 %ifarch %{ix86}
-    # https://github.com/antirez/redis/issues/753
     CFLAGS+=" -march=i686" \
 %endif
 %endif
