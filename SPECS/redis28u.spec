@@ -1,57 +1,63 @@
-%global _hardened_build 1
+%global real_name redis
+%global ius_suffix 30u
 
 # redis 2.8 sentinel is the first upstream version to work
 # however as packaged here it is entirely broken
 # FIXME: consider removal into a separate package
-%if 0%{?fedora} >= 21 || 0%{?rhel} >= 7
+%if 0%{?rhel} >= 7
 %global with_sentinel 1
 %endif
 
-%if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
+%if 0%{?rhel} >= 7
 %global with_systemd 1
 %else
 %global with_systemd 0
 %endif
 
 # tcl 8.4 in EL5.
-%if 0%{?el5}
+%if 0%{?rhel} <= 5
 %global with_tests 0
 %else
 %global with_tests 1
 %endif
 
-Name:              redis
+Name:              %{real_name}%{ius_suffix}
 Version:           2.8.13
-Release:           3%{?dist}
+Release:           3.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
+%{?el5:Group:      Applications/Databases}
 License:           BSD
 URL:               http://redis.io
-Source0:           http://download.redis.io/releases/%{name}-%{version}.tar.gz
-Source1:           %{name}.logrotate
-Source2:           %{name}-sentinel.service
-Source3:           %{name}.service
-Source4:           %{name}.tmpfiles
-Source5:           %{name}-sentinel.init
-Source6:           %{name}.init
-# Update configuration for Fedora
+Source0:           http://download.redis.io/releases/%{real_name}-%{version}.tar.gz
+Source1:           %{real_name}.logrotate
+Source2:           %{real_name}-sentinel.service
+Source3:           %{real_name}.service
+Source4:           %{real_name}.tmpfiles
+Source5:           %{real_name}-sentinel.init
+Source6:           %{real_name}.init
 Patch0:            redis-2.8.11-redis-conf.patch
 Patch1:            redis-2.8.11-deps-library-fPIC-performance-tuning.patch
 Patch2:            redis-2.8.11-use-system-jemalloc.patch
 # tests/integration/replication-psync.tcl failed on slow machines(GITHUB #1417)
+# https://github.com/antirez/redis/issues/1417
 Patch3:            redis-2.8.11-disable-test-failed-on-slow-machine.patch
+%{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
+
 BuildRequires:     jemalloc-devel
-%if 0%{?with_tests}
-BuildRequires:     procps-ng
-%endif
-%if 0%{?with_systemd}
-BuildRequires:     systemd
-%endif
-%if 0%{?with_tests}
-BuildRequires:     tcl
-%endif
 Requires:          logrotate
 Requires(pre):     shadow-utils
+
+%if 0%{?with_tests}
+BuildRequires:     tcl
+%if 0%{?rhel} >= 7
+BuildRequires:     procps-ng
+%else
+BuildRequires:     procps
+%endif
+%endif
+
 %if 0%{?with_systemd}
+BuildRequires:     systemd
 Requires(post):    systemd
 Requires(preun):   systemd
 Requires(postun):  systemd
@@ -61,6 +67,7 @@ Requires(preun):   chkconfig
 Requires(preun):   initscripts
 Requires(postun):  initscripts
 %endif
+
 
 %description
 Redis is an advanced key-value store. It is often referred to as a data 
@@ -87,8 +94,9 @@ a cache.
 
 You can use Redis from most programming languages also.
 
+
 %prep
-%setup -q
+%setup -q -n %{real_name}-%{version}
 rm -frv deps/jemalloc
 %patch0 -p1
 %patch1 -p1
@@ -109,6 +117,7 @@ sed -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/hiredis/Makefile
 sed -i -e 's|$(CFLAGS)|%{optflags}|g' deps/linenoise/Makefile
 sed -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/linenoise/Makefile
 
+
 %build
 make %{?_smp_mflags} \
     DEBUG="" \
@@ -118,21 +127,23 @@ make %{?_smp_mflags} \
     MALLOC=jemalloc \
     all
 
+
 %install
+%{?el5:%{__rm} -rf %{buildroot}}
 make install INSTALL="install -p" PREFIX=%{buildroot}%{_prefix}
 
 # Filesystem.
-install -d %{buildroot}%{_sharedstatedir}/%{name}
-install -d %{buildroot}%{_localstatedir}/log/%{name}
-install -d %{buildroot}%{_localstatedir}/run/%{name}
+install -d %{buildroot}%{_sharedstatedir}/%{real_name}
+install -d %{buildroot}%{_localstatedir}/log/%{real_name}
+install -d %{buildroot}%{_localstatedir}/run/%{real_name}
 
 # Install logrotate file.
-install -pDm644 %{S:1} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+install -pDm644 %{S:1} %{buildroot}%{_sysconfdir}/logrotate.d/%{real_name}
 
 # Install configuration files.
-install -pDm644 %{name}.conf %{buildroot}%{_sysconfdir}/%{name}.conf
+install -pDm644 %{real_name}.conf %{buildroot}%{_sysconfdir}/%{real_name}.conf
 %if 0%{?with_sentinel}
-install -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/%{name}-sentinel.conf
+install -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/%{real_name}-sentinel.conf
 %endif
 
 # Install Systemd/SysV files.
@@ -144,16 +155,21 @@ install -pm644 %{S:2} %{buildroot}%{_unitdir}
 %endif
 
 # Install systemd tmpfiles config.
-install -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/%{name}.conf
+install -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/%{real_name}.conf
 %else
 %if 0%{?with_sentinel}
-install -pDm755 %{S:5} %{buildroot}%{_initrddir}/%{name}-sentinel
+install -pDm755 %{S:5} %{buildroot}%{_initrddir}/%{real_name}-sentinel
 %endif
-install -pDm755 %{S:6} %{buildroot}%{_initrddir}/%{name}
+install -pDm755 %{S:6} %{buildroot}%{_initrddir}/%{real_name}
 %endif
 
 # Fix non-standard-executable-perm error.
-chmod 755 %{buildroot}%{_bindir}/%{name}-*
+chmod 755 %{buildroot}%{_bindir}/%{real_name}-*
+
+
+%{?el5:%clean}
+%{?el5:%{__rm} -rf %{buildroot}}
+
 
 %check
 %if 0%{?with_tests}
@@ -163,79 +179,84 @@ make test-sentinel
 %endif
 %endif
 
+
 %pre
-getent group %{name} &> /dev/null || groupadd -r %{name} &> /dev/null
-getent passwd %{name} &> /dev/null || \
-useradd -r -g %{name} -d %{_sharedstatedir}/%{name} -s /sbin/nologin \
--c 'Redis Database Server' %{name} &> /dev/null
+getent group %{real_name} &> /dev/null || groupadd -r %{real_name} &> /dev/null
+getent passwd %{real_name} &> /dev/null || \
+useradd -r -g %{real_name} -d %{_sharedstatedir}/%{real_name} -s /sbin/nologin \
+-c 'Redis Database Server' %{real_name} &> /dev/null
 exit 0
+
 
 %post
 %if 0%{?with_systemd}
 %if 0%{?with_sentinel}
-%systemd_post %{name}-sentinel.service
+%systemd_post %{real_name}-sentinel.service
 %endif
-%systemd_post %{name}.service
+%systemd_post %{real_name}.service
 %else
 %if 0%{?with_sentinel}
-chkconfig --add %{name}-sentinel
+chkconfig --add %{real_name}-sentinel
 %endif
-chkconfig --add %{name}
+chkconfig --add %{real_name}
 %endif
+
 
 %preun
 %if 0%{?with_systemd}
 %if 0%{?with_sentinel}
-%systemd_preun %{name}-sentinel.service
+%systemd_preun %{real_name}-sentinel.service
 %endif
-%systemd_preun %{name}.service
+%systemd_preun %{real_name}.service
 %else
 if [ $1 -eq 0 ] ; then
 %if 0%{?with_sentinel}
-service %{name}-sentinel stop &> /dev/null
-chkconfig --del %{name}-sentinel &> /dev/null
+service %{real_name}-sentinel stop &> /dev/null
+chkconfig --del %{real_name}-sentinel &> /dev/null
 %endif
-service %{name} stop &> /dev/null
-chkconfig --del %{name} &> /dev/null
+service %{real_name} stop &> /dev/null
+chkconfig --del %{real_name} &> /dev/null
 %endif
+
 
 %postun
 %if 0%{?with_systemd}
 %if 0%{?with_sentinel}
-%systemd_postun_with_restart %{name}-sentinel.service
+%systemd_postun_with_restart %{real_name}-sentinel.service
 %endif
-%systemd_postun_with_restart %{name}.service
+%systemd_postun_with_restart %{real_name}.service
 %else
 if [ "$1" -ge "1" ] ; then
 %if 0%{?with_sentinel}
-    service %{name}-sentinel condrestart >/dev/null 2>&1 || :
+    service %{real_name}-sentinel condrestart >/dev/null 2>&1 || :
 %endif
-    service %{name} condrestart >/dev/null 2>&1 || :
+    service %{real_name} condrestart >/dev/null 2>&1 || :
 fi
 %endif
 
+
 %files
 %doc 00-RELEASENOTES BUGS CONTRIBUTING COPYING MANIFESTO README
-%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-%config(noreplace) %{_sysconfdir}/%{name}.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/%{real_name}
+%config(noreplace) %{_sysconfdir}/%{real_name}.conf
 %if 0%{?with_sentinel}
-%config(noreplace) %{_sysconfdir}/%{name}-sentinel.conf
+%config(noreplace) %{_sysconfdir}/%{real_name}-sentinel.conf
 %endif
-%dir %attr(0750, redis, redis) %{_sharedstatedir}/%{name}
-%dir %attr(0750, redis, redis) %{_localstatedir}/log/%{name}
-%dir %attr(0750, redis, redis) %{_localstatedir}/run/%{name}
-%{_bindir}/%{name}-*
+%dir %attr(0750, redis, redis) %{_sharedstatedir}/%{real_name}
+%dir %attr(0750, redis, redis) %{_localstatedir}/log/%{real_name}
+%dir %attr(0750, redis, redis) %{_localstatedir}/run/%{real_name}
+%{_bindir}/%{real_name}-*
 %if 0%{?with_systemd}
-%{_tmpfilesdir}/%{name}.conf
+%{_tmpfilesdir}/%{real_name}.conf
 %if 0%{?with_sentinel}
-%{_unitdir}/%{name}-sentinel.service
+%{_unitdir}/%{real_name}-sentinel.service
 %endif
-%{_unitdir}/%{name}.service
+%{_unitdir}/%{real_name}.service
 %else
 %if 0%{?with_sentinel}
-%{_initrddir}/%{name}-sentinel
+%{_initrddir}/%{real_name}-sentinel
 %endif
-%{_initrddir}/%{name}
+%{_initrddir}/%{real_name}
 %endif
 
 %changelog
