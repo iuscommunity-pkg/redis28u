@@ -23,7 +23,7 @@
 
 Name:              %{real_name}%{ius_suffix}
 Version:           2.8.13
-Release:           4.ius%{?dist}
+Release:           5.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
 License:           BSD
@@ -67,6 +67,11 @@ Requires(preun):   chkconfig
 Requires(preun):   initscripts
 Requires(postun):  initscripts
 %endif
+
+Provides: %{real_name} = %{version}-%{release}
+Provides: %{real_name}(x86-64) = %{version}-%{release}
+Provides: config(%{real_name}) = %{version}-%{release}
+Conflicts: %{real_name} < %{version}
 
 
 %description
@@ -268,6 +273,9 @@ fi
 
 
 %changelog
+* Thu Jul 31 2014 Carl George <carl.george@rackspace.com> - 2.8.13-5.ius
+- Add in IUS conflicts and provides
+
 * Wed Jul 30 2014 Carl George <carl.george@rackspace.com> - 2.8.13-4.ius
 - Port from epel7 to IUS
 - Correct build error on 32bit el5
