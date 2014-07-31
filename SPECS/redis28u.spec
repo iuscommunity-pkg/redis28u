@@ -69,7 +69,7 @@ Requires(postun):  initscripts
 %endif
 
 Provides: %{real_name} = %{version}-%{release}
-Provides: %{real_name}(x86-64) = %{version}-%{release}
+Provides: %{real_name}%{?_isa} = %{version}-%{release}
 Provides: config(%{real_name}) = %{version}-%{release}
 Conflicts: %{real_name} < %{version}
 
