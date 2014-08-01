@@ -292,7 +292,7 @@ fi
 - Revert redis.init as it too handled daemonizing.
 - Revert tcp-keepalive default to 0.
 - Revert ExecStartPre hack, /var/lib/redis is owned by the package.
-  No %ghost directories, just own it.
+  No %%ghost directories, just own it.
 - FIXME: sentinel is broken, mispackaged and quite possibly belongs in an entirely separate package
   because it is not meant to be used concurrently with the ordinary systemd redis and it requires
   a highly specialized custom configuration.
