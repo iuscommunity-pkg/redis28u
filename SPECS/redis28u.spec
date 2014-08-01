@@ -23,7 +23,7 @@
 
 Name:              %{real_name}%{ius_suffix}
 Version:           2.8.13
-Release:           5.ius%{?dist}
+Release:           6.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
 License:           BSD
@@ -278,6 +278,11 @@ fi
 
 
 %changelog
+* Fri Aug 01 2014 Carl George <carl.george@rackspace.com> - 2.8.13-6.ius
+- Correct path issue in init script
+- Apply patch to set 'daemonize yes' only if not using systemd
+- Correct broken preuninstall script
+
 * Thu Jul 31 2014 Carl George <carl.george@rackspace.com> - 2.8.13-5.ius
 - Add in IUS conflicts and provides
 
