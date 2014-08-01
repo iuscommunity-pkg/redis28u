@@ -232,6 +232,7 @@ chkconfig --del %{real_name}-sentinel &> /dev/null
 %endif
 service %{real_name} stop &> /dev/null
 chkconfig --del %{real_name} &> /dev/null
+fi
 %endif
 
 
