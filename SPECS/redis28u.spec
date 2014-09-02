@@ -22,8 +22,8 @@
 %endif
 
 Name:              %{real_name}%{ius_suffix}
-Version:           2.8.13
-Release:           6.ius%{?dist}
+Version:           2.8.14
+Release:           1.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
 License:           BSD
@@ -36,7 +36,7 @@ Source4:           %{real_name}.tmpfiles
 Source5:           %{real_name}-sentinel.init
 Source6:           %{real_name}.init
 Patch0:            redis-2.8.11-redis-conf.patch
-Patch1:            redis-2.8.11-deps-library-fPIC-performance-tuning.patch
+Patch1:            redis-2.8.14-deps-library-fPIC-performance-tuning.patch
 Patch2:            redis-2.8.11-use-system-jemalloc.patch
 # tests/integration/replication-psync.tcl failed on slow machines(GITHUB #1417)
 # https://github.com/antirez/redis/issues/1417
@@ -278,6 +278,10 @@ fi
 
 
 %changelog
+* Tue Sep 02 2014 Carl George <carl.george@rackspace.com> - 2.8.14-1.ius
+- Latest upstream source
+- Rebase patch1
+
 * Fri Aug 01 2014 Carl George <carl.george@rackspace.com> - 2.8.13-6.ius
 - Correct path issue in init script
 - Apply patch to set 'daemonize yes' only if not using systemd
