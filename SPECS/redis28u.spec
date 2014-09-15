@@ -38,9 +38,6 @@ Source6:           %{real_name}.init
 Patch0:            redis-2.8.11-redis-conf.patch
 Patch1:            redis-2.8.14-deps-library-fPIC-performance-tuning.patch
 Patch2:            redis-2.8.11-use-system-jemalloc.patch
-# tests/integration/replication-psync.tcl failed on slow machines(GITHUB #1417)
-# https://github.com/antirez/redis/issues/1417
-Patch3:            redis-2.8.11-disable-test-failed-on-slow-machine.patch
 Patch4:            redis-2.8.13-daemonize.patch
 %{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
 
@@ -107,9 +104,6 @@ You can use Redis from most programming languages also.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%if 0%{?with_tests}
-%patch3 -p1
-%endif
 %if ! 0%{?with_systemd}
 %patch4 -p1
 %endif
@@ -278,7 +272,8 @@ fi
 %changelog
 * Mon Sep 15 2014 Carl George <carl.george@rackspace.com> - 2.8.15-1.ius
 - Latest upstream source
-- Patch5 merged upstream
+- Patch3 fixed upstream
+- Patch5 fixed upstream
 
 * Tue Sep 02 2014 Carl George <carl.george@rackspace.com> - 2.8.14-1.ius
 - Latest upstream source
