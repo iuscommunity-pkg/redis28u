@@ -22,7 +22,7 @@
 %endif
 
 Name:              %{real_name}%{ius_suffix}
-Version:           2.8.14
+Version:           2.8.15
 Release:           1.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
@@ -42,9 +42,6 @@ Patch2:            redis-2.8.11-use-system-jemalloc.patch
 # https://github.com/antirez/redis/issues/1417
 Patch3:            redis-2.8.11-disable-test-failed-on-slow-machine.patch
 Patch4:            redis-2.8.13-daemonize.patch
-# https://github.com/antirez/redis/issues/1981
-# should be in next release after 2.8.14
-Patch5:            redis-2.8.14-increase-size-of-range-request.patch
 %{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
 
 BuildRequires:     jemalloc-devel
@@ -116,7 +113,6 @@ You can use Redis from most programming languages also.
 %if ! 0%{?with_systemd}
 %patch4 -p1
 %endif
-%patch5 -p1
 
 # No hidden build.
 %{__sed} -i -e 's|\t@|\t|g' deps/lua/src/Makefile
@@ -173,8 +169,6 @@ You can use Redis from most programming languages also.
 %if 0%{?with_sentinel}
 %{__install} -pm644 %{S:2} %{buildroot}%{_unitdir}
 %endif
-
-# Install systemd tmpfiles config.
 %{__install} -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/%{real_name}.conf
 %else
 %if 0%{?with_sentinel}
@@ -282,6 +276,10 @@ fi
 
 
 %changelog
+* Mon Sep 15 2014 Carl George <carl.george@rackspace.com> - 2.8.15-1.ius
+- Latest upstream source
+- Patch5 merged upstream
+
 * Tue Sep 02 2014 Carl George <carl.george@rackspace.com> - 2.8.14-1.ius
 - Latest upstream source
 - Rebase patch1
