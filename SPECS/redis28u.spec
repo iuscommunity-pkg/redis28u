@@ -23,7 +23,7 @@
 
 Name:              %{real_name}%{ius_suffix}
 Version:           2.8.17
-Release:           1.ius%{?dist}
+Release:           2.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
 License:           BSD
@@ -144,6 +144,7 @@ You can use Redis from most programming languages also.
 
 # Filesystem.
 %{__install} -d %{buildroot}%{_sharedstatedir}/%{real_name}
+%{__install} -d %{buildroot}%{_localstatedir}/lib/%{real_name}
 %{__install} -d %{buildroot}%{_localstatedir}/log/%{real_name}
 %{__install} -d %{buildroot}%{_localstatedir}/run/%{real_name}
 
@@ -252,6 +253,7 @@ fi
 %config(noreplace) %{_sysconfdir}/%{real_name}-sentinel.conf
 %endif
 %dir %attr(0750, redis, redis) %{_sharedstatedir}/%{real_name}
+%dir %attr(0750, redis, redis) %{_localstatedir}/lib/%{real_name}
 %dir %attr(0750, redis, redis) %{_localstatedir}/log/%{real_name}
 %dir %attr(0750, redis, redis) %{_localstatedir}/run/%{real_name}
 %{_bindir}/%{real_name}-*
@@ -270,6 +272,9 @@ fi
 
 
 %changelog
+* Thu Nov 06 2014 Ben Harper <ben.harper@rackspace.com> - 2.8.17-2.ius
+- add /var/lib/redis see LP bug #1389918
+
 * Mon Sep 22 2014 Carl George <carl.george@rackspace.com> - 2.8.17-1.ius
 - Latest upstream source
 
