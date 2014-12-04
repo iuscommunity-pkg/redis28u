@@ -22,7 +22,7 @@
 %endif
 
 Name:              %{real_name}%{ius_suffix}
-Version:           2.8.17
+Version:           2.8.18
 Release:           1.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
@@ -35,10 +35,10 @@ Source3:           %{real_name}.service
 Source4:           %{real_name}.tmpfiles
 Source5:           %{real_name}-sentinel.init
 Source6:           %{real_name}.init
-Patch0:            redis-2.8.11-redis-conf.patch
-Patch1:            redis-2.8.14-deps-library-fPIC-performance-tuning.patch
+Patch1:            redis-2.8.18-deps-library-fPIC-performance-tuning.patch
 Patch2:            redis-2.8.11-use-system-jemalloc.patch
-Patch4:            redis-2.8.13-daemonize.patch
+Patch5:            redis-2.8.18-redis-conf-systemd.patch
+Patch6:            redis-2.8.18-redis-conf-init.patch
 %{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
 
 BuildRequires:     jemalloc-devel
@@ -101,11 +101,12 @@ You can use Redis from most programming languages also.
 %prep
 %setup -q -n %{real_name}-%{version}
 %{__rm} -frv deps/jemalloc
-%patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%if ! 0%{?with_systemd}
-%patch4 -p1
+%if 0%{?with_systemd}
+%patch5 -p1
+%else
+%patch6 -p1
 %endif
 
 # No hidden build.
@@ -270,6 +271,10 @@ fi
 
 
 %changelog
+* Thu Dec 04 2014 Carl George <carl.george@rackspace.com> - 2.8.18-1.ius
+- Latest upstream source
+- Use separate config patches for systemd/init
+
 * Mon Sep 22 2014 Carl George <carl.george@rackspace.com> - 2.8.17-1.ius
 - Latest upstream source
 
