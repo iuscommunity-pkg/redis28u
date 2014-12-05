@@ -21,6 +21,13 @@
 %global with_tests 1
 %endif
 
+# stock el5 gcc is 4.1.2 - too old!
+%if 0%{?rhel} <= 5
+%global with_gcc44 1
+%else
+%global with_gcc44 0
+%endif
+
 Name:              %{real_name}%{ius_suffix}
 Version:           2.8.18
 Release:           1.ius%{?dist}
@@ -52,6 +59,10 @@ BuildRequires:     procps-ng
 %else
 BuildRequires:     procps
 %endif
+%endif
+
+%if 0%{?with_gcc44}
+BuildRequires: gcc44
 %endif
 
 %if 0%{?with_systemd}
@@ -123,17 +134,14 @@ You can use Redis from most programming languages also.
 
 
 %build
-# the if statement below is in reference to this issue
-# https://github.com/antirez/redis/issues/753
+%if 0%{?with_gcc44}
+export CC=gcc44
+export LINKCC=gcc44
+%endif
 %{__make} %{?_smp_mflags} \
     DEBUG="" \
     LDFLAGS="%{?__global_ldflags}" \
     CFLAGS+="%{optflags}" \
-%if 0%{?rhel} <= 5
-%ifarch %{ix86}
-    CFLAGS+=" -march=i686" \
-%endif
-%endif
     LUA_LDFLAGS+="%{?__global_ldflags}" \
     MALLOC=jemalloc \
     all
