@@ -46,6 +46,7 @@ Patch1:            redis-2.8.18-deps-library-fPIC-performance-tuning.patch
 Patch2:            redis-2.8.11-use-system-jemalloc.patch
 Patch5:            redis-2.8.18-redis-conf-systemd.patch
 Patch6:            redis-2.8.18-redis-conf-init.patch
+Patch7:            redis-2.8.18-deps-lua-cmsgpack.patch
 %{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
 
 BuildRequires:     jemalloc-devel
@@ -119,6 +120,7 @@ You can use Redis from most programming languages also.
 %else
 %patch6 -p1
 %endif
+%patch7 -p1
 
 # No hidden build.
 %{__sed} -i -e 's|\t@|\t|g' deps/lua/src/Makefile
