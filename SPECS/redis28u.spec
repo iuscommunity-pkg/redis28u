@@ -21,8 +21,15 @@
 %global with_tests 1
 %endif
 
+# stock el5 gcc is 4.1.2 - too old!
+%if 0%{?rhel} <= 5
+%global with_gcc44 1
+%else
+%global with_gcc44 0
+%endif
+
 Name:              %{real_name}%{ius_suffix}
-Version:           2.8.17
+Version:           2.8.18
 Release:           1.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
@@ -35,10 +42,11 @@ Source3:           %{real_name}.service
 Source4:           %{real_name}.tmpfiles
 Source5:           %{real_name}-sentinel.init
 Source6:           %{real_name}.init
-Patch0:            redis-2.8.11-redis-conf.patch
-Patch1:            redis-2.8.14-deps-library-fPIC-performance-tuning.patch
+Patch1:            redis-2.8.18-deps-library-fPIC-performance-tuning.patch
 Patch2:            redis-2.8.11-use-system-jemalloc.patch
-Patch4:            redis-2.8.13-daemonize.patch
+Patch5:            redis-2.8.18-redis-conf-systemd.patch
+Patch6:            redis-2.8.18-redis-conf-init.patch
+Patch7:            redis-2.8.18-deps-lua-cmsgpack.patch
 %{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
 
 BuildRequires:     jemalloc-devel
@@ -52,6 +60,10 @@ BuildRequires:     procps-ng
 %else
 BuildRequires:     procps
 %endif
+%endif
+
+%if 0%{?with_gcc44}
+BuildRequires: gcc44
 %endif
 
 %if 0%{?with_systemd}
@@ -101,12 +113,14 @@ You can use Redis from most programming languages also.
 %prep
 %setup -q -n %{real_name}-%{version}
 %{__rm} -frv deps/jemalloc
-%patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%if ! 0%{?with_systemd}
-%patch4 -p1
+%if 0%{?with_systemd}
+%patch5 -p1
+%else
+%patch6 -p1
 %endif
+%patch7 -p1
 
 # No hidden build.
 %{__sed} -i -e 's|\t@|\t|g' deps/lua/src/Makefile
@@ -122,17 +136,14 @@ You can use Redis from most programming languages also.
 
 
 %build
-# the if statement below is in reference to this issue
-# https://github.com/antirez/redis/issues/753
+%if 0%{?with_gcc44}
+export CC=gcc44
+export LINKCC=gcc44
+%endif
 %{__make} %{?_smp_mflags} \
     DEBUG="" \
     LDFLAGS="%{?__global_ldflags}" \
     CFLAGS+="%{optflags}" \
-%if 0%{?rhel} <= 5
-%ifarch %{ix86}
-    CFLAGS+=" -march=i686" \
-%endif
-%endif
     LUA_LDFLAGS+="%{?__global_ldflags}" \
     MALLOC=jemalloc \
     all
@@ -189,7 +200,8 @@ You can use Redis from most programming languages also.
 
 
 %pre
-getent group %{real_name} &> /dev/null || groupadd -r %{real_name} &> /dev/null
+getent group %{real_name} &> /dev/null || \
+groupadd -r %{real_name} &> /dev/null
 getent passwd %{real_name} &> /dev/null || \
 useradd -r -g %{real_name} -d %{_sharedstatedir}/%{real_name} -s /sbin/nologin \
 -c 'Redis Database Server' %{real_name} &> /dev/null
@@ -270,6 +282,10 @@ fi
 
 
 %changelog
+* Thu Dec 04 2014 Carl George <carl.george@rackspace.com> - 2.8.18-1.ius
+- Latest upstream source
+- Use separate config patches for systemd/init
+
 * Mon Sep 22 2014 Carl George <carl.george@rackspace.com> - 2.8.17-1.ius
 - Latest upstream source
 
