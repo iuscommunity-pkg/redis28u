@@ -198,7 +198,8 @@ export LINKCC=gcc44
 
 
 %pre
-getent group %{real_name} &> /dev/null || groupadd -r %{real_name} &> /dev/null
+getent group %{real_name} &> /dev/null || \
+groupadd -r %{real_name} &> /dev/null
 getent passwd %{real_name} &> /dev/null || \
 useradd -r -g %{real_name} -d %{_sharedstatedir}/%{real_name} -s /sbin/nologin \
 -c 'Redis Database Server' %{real_name} &> /dev/null
