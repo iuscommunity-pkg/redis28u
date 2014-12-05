@@ -284,14 +284,14 @@ fi
 
 
 %changelog
-<<<<<<< HEAD
 * Thu Dec 04 2014 Carl George <carl.george@rackspace.com> - 2.8.18-1.ius
 - Latest upstream source
 - Use separate config patches for systemd/init
-=======
+- Switch to gcc44
+- Backport upstream fix (patch7) for el5 builds
+
 * Thu Nov 06 2014 Ben Harper <ben.harper@rackspace.com> - 2.8.17-2.ius
 - add /var/lib/redis see LP bug #1389918
->>>>>>> b3ba5bad782e813e8dfe59ae9ac8a98c7c559c11
 
 * Mon Sep 22 2014 Carl George <carl.george@rackspace.com> - 2.8.17-1.ius
 - Latest upstream source
