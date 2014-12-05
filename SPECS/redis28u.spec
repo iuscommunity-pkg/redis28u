@@ -155,6 +155,7 @@ export LINKCC=gcc44
 
 # Filesystem.
 %{__install} -d %{buildroot}%{_sharedstatedir}/%{real_name}
+%{__install} -d %{buildroot}%{_localstatedir}/lib/%{real_name}
 %{__install} -d %{buildroot}%{_localstatedir}/log/%{real_name}
 %{__install} -d %{buildroot}%{_localstatedir}/run/%{real_name}
 
@@ -264,6 +265,7 @@ fi
 %config(noreplace) %{_sysconfdir}/%{real_name}-sentinel.conf
 %endif
 %dir %attr(0750, redis, redis) %{_sharedstatedir}/%{real_name}
+%dir %attr(0750, redis, redis) %{_localstatedir}/lib/%{real_name}
 %dir %attr(0750, redis, redis) %{_localstatedir}/log/%{real_name}
 %dir %attr(0750, redis, redis) %{_localstatedir}/run/%{real_name}
 %{_bindir}/%{real_name}-*
@@ -282,9 +284,14 @@ fi
 
 
 %changelog
+<<<<<<< HEAD
 * Thu Dec 04 2014 Carl George <carl.george@rackspace.com> - 2.8.18-1.ius
 - Latest upstream source
 - Use separate config patches for systemd/init
+=======
+* Thu Nov 06 2014 Ben Harper <ben.harper@rackspace.com> - 2.8.17-2.ius
+- add /var/lib/redis see LP bug #1389918
+>>>>>>> b3ba5bad782e813e8dfe59ae9ac8a98c7c559c11
 
 * Mon Sep 22 2014 Carl George <carl.george@rackspace.com> - 2.8.17-1.ius
 - Latest upstream source
