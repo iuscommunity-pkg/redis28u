@@ -46,6 +46,7 @@ Patch1:            redis-2.8.18-deps-library-fPIC-performance-tuning.patch
 Patch2:            redis-2.8.11-use-system-jemalloc.patch
 Patch5:            redis-2.8.18-redis-conf-systemd.patch
 Patch6:            redis-2.8.18-redis-conf-init.patch
+Patch8:            redis-2.8.19-remove-sentinel-symlink.patch
 %{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
 
 BuildRequires:     jemalloc-devel
@@ -118,6 +119,9 @@ You can use Redis from most programming languages also.
 %patch5 -p1
 %else
 %patch6 -p1
+%endif
+%if ! 0%{?with_sentinel}
+%patch8 -p1
 %endif
 
 # No hidden build.
@@ -285,6 +289,7 @@ fi
 * Tue Dec 16 2014 Carl George <carl.george@rackspace.com> - 2.8.19-1.ius
 - Latest upstream source
 - Remove patch7
+- Don't add symlink for redis-sentinel (patch8)
 
 * Thu Dec 04 2014 Carl George <carl.george@rackspace.com> - 2.8.18-1.ius
 - Latest upstream source
