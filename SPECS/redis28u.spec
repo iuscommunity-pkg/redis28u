@@ -29,7 +29,7 @@
 %endif
 
 Name:              %{real_name}%{ius_suffix}
-Version:           2.8.18
+Version:           2.8.19
 Release:           1.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
@@ -46,7 +46,6 @@ Patch1:            redis-2.8.18-deps-library-fPIC-performance-tuning.patch
 Patch2:            redis-2.8.11-use-system-jemalloc.patch
 Patch5:            redis-2.8.18-redis-conf-systemd.patch
 Patch6:            redis-2.8.18-redis-conf-init.patch
-Patch7:            redis-2.8.18-deps-lua-cmsgpack.patch
 %{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
 
 BuildRequires:     jemalloc-devel
@@ -120,7 +119,6 @@ You can use Redis from most programming languages also.
 %else
 %patch6 -p1
 %endif
-%patch7 -p1
 
 # No hidden build.
 %{__sed} -i -e 's|\t@|\t|g' deps/lua/src/Makefile
@@ -284,6 +282,10 @@ fi
 
 
 %changelog
+* Tue Dec 16 2014 Carl George <carl.george@rackspace.com> - 2.8.19-1.ius
+- Latest upstream source
+- Remove patch7
+
 * Thu Dec 04 2014 Carl George <carl.george@rackspace.com> - 2.8.18-1.ius
 - Latest upstream source
 - Use separate config patches for systemd/init
