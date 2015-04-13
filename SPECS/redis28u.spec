@@ -23,7 +23,7 @@
 
 Name:              %{real_name}%{ius_suffix}
 Version:           2.8.19
-Release:           1.ius%{?dist}
+Release:           2.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
 License:           BSD
@@ -271,6 +271,13 @@ fi
 
 
 %changelog
+* Mon Apr 13 2015 Carl George <carl.george@rackspace.com> - 2.8.19-2.ius
+- Add redis-shutdown helper script
+- Control daemonization from within service/init files
+- Enable sentinel
+- Fix #3 (/usr/com/redis)
+- Increase open file limits
+
 * Tue Dec 16 2014 Carl George <carl.george@rackspace.com> - 2.8.19-1.ius
 - Latest upstream source
 - Remove patch7
