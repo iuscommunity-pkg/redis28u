@@ -249,11 +249,11 @@ fi
 %files
 %doc 00-RELEASENOTES BUGS CONTRIBUTING COPYING MANIFESTO README
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{real_name}
-%config(noreplace) %{_sysconfdir}/%{real_name}.conf
-%config(noreplace) %{_sysconfdir}/%{real_name}-sentinel.conf
-%dir %attr(0750, redis, redis) %{_localstatedir}/lib/%{real_name}
-%dir %attr(0750, redis, redis) %{_localstatedir}/log/%{real_name}
-%dir %attr(0750, redis, redis) %{_localstatedir}/run/%{real_name}
+%attr(0644, redis, root) %config(noreplace) %{_sysconfdir}/%{real_name}.conf
+%attr(0644, redis, root) %config(noreplace) %{_sysconfdir}/%{real_name}-sentinel.conf
+%dir %attr(0755, redis, redis) %{_localstatedir}/lib/%{real_name}
+%dir %attr(0755, redis, redis) %{_localstatedir}/log/%{real_name}
+%dir %attr(0755, redis, redis) %{_localstatedir}/run/%{real_name}
 %{_bindir}/%{real_name}-*
 %if 0%{?with_systemd}
 %{_tmpfilesdir}/%{real_name}.conf
