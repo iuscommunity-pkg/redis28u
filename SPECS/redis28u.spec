@@ -146,7 +146,6 @@ export LINKCC=gcc44
 %{__make} install INSTALL="install -p" PREFIX=%{buildroot}%{_prefix}
 
 # Filesystem.
-%{__install} -d %{buildroot}%{_sharedstatedir}/%{real_name}
 %{__install} -d %{buildroot}%{_localstatedir}/lib/%{real_name}
 %{__install} -d %{buildroot}%{_localstatedir}/log/%{real_name}
 %{__install} -d %{buildroot}%{_localstatedir}/run/%{real_name}
@@ -197,7 +196,7 @@ install -pDm755 %{S:7} %{buildroot}%{_bindir}/%{real_name}-shutdown
 getent group %{real_name} &> /dev/null || \
 groupadd -r %{real_name} &> /dev/null
 getent passwd %{real_name} &> /dev/null || \
-useradd -r -g %{real_name} -d %{_sharedstatedir}/%{real_name} -s /sbin/nologin \
+useradd -r -g %{real_name} -d %{_localstatedir}/lib/%{real_name} -s /sbin/nologin \
 -c 'Redis Database Server' %{real_name} &> /dev/null
 exit 0
 
@@ -243,7 +242,6 @@ fi
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{real_name}
 %config(noreplace) %{_sysconfdir}/%{real_name}.conf
 %config(noreplace) %{_sysconfdir}/%{real_name}-sentinel.conf
-%dir %attr(0750, redis, redis) %{_sharedstatedir}/%{real_name}
 %dir %attr(0750, redis, redis) %{_localstatedir}/lib/%{real_name}
 %dir %attr(0750, redis, redis) %{_localstatedir}/log/%{real_name}
 %dir %attr(0750, redis, redis) %{_localstatedir}/run/%{real_name}
