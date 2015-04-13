@@ -36,6 +36,8 @@ Source4:           %{real_name}.tmpfiles
 Source5:           %{real_name}-sentinel.init
 Source6:           %{real_name}.init
 Source7:           %{real_name}-shutdown
+Source8:           %{real_name}-limit-systemd
+Source9:           %{real_name}-limit-init
 
 Patch0001:            0001-redis-2.8.18-redis-conf.patch
 Patch0002:            0002-redis-2.8.18-deps-library-fPIC-performance-tuning.patch
@@ -167,10 +169,14 @@ export LINKCC=gcc44
 %{__install} -pm644 %{S:2} %{buildroot}%{_unitdir}
 # Install systemd tmpfiles config.
 %{__install} -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/%{real_name}.conf
+# Install systemd limit files (requires systemd >= 204)
+%{__install} -pDm644 %{S:8} %{buildroot}%{_sysconfdir}/systemd/system/%{real_name}.service.d/limit.conf
+%{__install} -pDm644 %{S:8} %{buildroot}%{_sysconfdir}/systemd/system/%{real_name}-sentinel.service.d/limit.conf
 %else
 # Install SysV service files.
 %{__install} -pDm755 %{S:5} %{buildroot}%{_initrddir}/%{real_name}-sentinel
 %{__install} -pDm755 %{S:6} %{buildroot}%{_initrddir}/%{real_name}
+%{__install} -pDm644 %{S:9} %{buildroot}%{_sysconfdir}/security/limits.d/95-%{real_name}.conf
 %endif
 
 # Fix non-standard-executable-perm error.
@@ -253,9 +259,14 @@ fi
 %{_tmpfilesdir}/%{real_name}.conf
 %{_unitdir}/%{real_name}.service
 %{_unitdir}/%{real_name}-sentinel.service
+%dir %{_sysconfdir}/systemd/system/%{real_name}.service.d
+%config(noreplace) %{_sysconfdir}/systemd/system/%{real_name}.service.d/limit.conf
+%dir %{_sysconfdir}/systemd/system/%{real_name}-sentinel.service.d
+%config(noreplace) %{_sysconfdir}/systemd/system/%{real_name}-sentinel.service.d/limit.conf
 %else
 %{_initrddir}/%{real_name}
 %{_initrddir}/%{real_name}-sentinel
+%config(noreplace) %{_sysconfdir}/security/limits.d/95-%{real_name}.conf
 %endif
 
 
