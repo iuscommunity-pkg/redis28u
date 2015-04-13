@@ -40,6 +40,8 @@ Source7:           %{real_name}-shutdown
 Patch0001:            0001-redis-2.8.18-redis-conf.patch
 Patch0002:            0002-redis-2.8.18-deps-library-fPIC-performance-tuning.patch
 Patch0003:            0003-redis-2.8.18-use-system-jemalloc.patch
+# Fix sentinel configuration to use a different log file than redis
+Patch0005:            0005-redis-2.8.18-sentinel-configuration-file-fix.patch
 
 %{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
 
@@ -113,6 +115,7 @@ You can use Redis from most programming languages also.
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
+%patch0005 -p1
 
 # No hidden build.
 %{__sed} -i -e 's|\t@|\t|g' deps/lua/src/Makefile
