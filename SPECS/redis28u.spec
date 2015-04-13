@@ -42,10 +42,11 @@ Source3:           %{real_name}.service
 Source4:           %{real_name}.tmpfiles
 Source5:           %{real_name}-sentinel.init
 Source6:           %{real_name}.init
+Source7:           %{real_name}-shutdown
+
+Patch0001:            0001-redis-2.8.18-redis-conf.patch
 Patch1:            redis-2.8.18-deps-library-fPIC-performance-tuning.patch
 Patch2:            redis-2.8.11-use-system-jemalloc.patch
-Patch5:            redis-2.8.18-redis-conf-systemd.patch
-Patch6:            redis-2.8.18-redis-conf-init.patch
 Patch8:            redis-2.8.19-remove-sentinel-symlink.patch
 %{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
 
@@ -65,6 +66,9 @@ BuildRequires:     procps
 %if 0%{?with_gcc44}
 BuildRequires: gcc44
 %endif
+
+# Required for redis-shutdown
+Requires:          /bin/awk
 
 %if 0%{?with_systemd}
 BuildRequires:     systemd
@@ -113,13 +117,9 @@ You can use Redis from most programming languages also.
 %prep
 %setup -q -n %{real_name}-%{version}
 %{__rm} -frv deps/jemalloc
+%patch0001 -p1
 %patch1 -p1
 %patch2 -p1
-%if 0%{?with_systemd}
-%patch5 -p1
-%else
-%patch6 -p1
-%endif
 %if ! 0%{?with_sentinel}
 %patch8 -p1
 %endif
@@ -187,6 +187,9 @@ export LINKCC=gcc44
 
 # Fix non-standard-executable-perm error.
 %{__chmod} 755 %{buildroot}%{_bindir}/%{real_name}-*
+
+# Install redis-shutdown
+install -pDm755 %{S:7} %{buildroot}%{_bindir}/%{real_name}-shutdown
 
 
 %{?el5:%clean}
