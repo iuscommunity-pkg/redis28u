@@ -47,7 +47,7 @@ Source7:           %{real_name}-shutdown
 Patch0001:            0001-redis-2.8.18-redis-conf.patch
 Patch0002:            0002-redis-2.8.18-deps-library-fPIC-performance-tuning.patch
 Patch0003:            0003-redis-2.8.18-use-system-jemalloc.patch
-Patch8:            redis-2.8.19-remove-sentinel-symlink.patch
+
 %{?el5:BuildRoot:  %{_tmppath}/%{real_name}-%{version}-%{release}-root-%(%{__id_u} -n)}
 
 BuildRequires:     jemalloc-devel
@@ -120,9 +120,6 @@ You can use Redis from most programming languages also.
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
-%if ! 0%{?with_sentinel}
-%patch8 -p1
-%endif
 
 # No hidden build.
 %{__sed} -i -e 's|\t@|\t|g' deps/lua/src/Makefile
@@ -187,6 +184,10 @@ export LINKCC=gcc44
 
 # Fix non-standard-executable-perm error.
 %{__chmod} 755 %{buildroot}%{_bindir}/%{real_name}-*
+
+# create redis-sentinel command as described on
+# http://redis.io/topics/sentinel
+ln -sf %{real_name}-server %{buildroot}%{_bindir}/%{real_name}-sentinel
 
 # Install redis-shutdown
 install -pDm755 %{S:7} %{buildroot}%{_bindir}/%{real_name}-shutdown
