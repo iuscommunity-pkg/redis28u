@@ -158,13 +158,15 @@ export LINKCC=gcc44
 %{__install} -pDm644 %{real_name}.conf %{buildroot}%{_sysconfdir}/%{real_name}.conf
 %{__install} -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/%{real_name}-sentinel.conf
 
-# Install Systemd/SysV files.
 %if 0%{?with_systemd}
+# Install Systemd unit files.
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__install} -pm644 %{S:3} %{buildroot}%{_unitdir}
 %{__install} -pm644 %{S:2} %{buildroot}%{_unitdir}
+# Install systemd tmpfiles config.
 %{__install} -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/%{real_name}.conf
 %else
+# Install SysV service files.
 %{__install} -pDm755 %{S:5} %{buildroot}%{_initrddir}/%{real_name}-sentinel
 %{__install} -pDm755 %{S:6} %{buildroot}%{_initrddir}/%{real_name}
 %endif
@@ -202,36 +204,36 @@ exit 0
 
 %post
 %if 0%{?with_systemd}
-%systemd_post %{real_name}-sentinel.service
 %systemd_post %{real_name}.service
+%systemd_post %{real_name}-sentinel.service
 %else
-chkconfig --add %{real_name}-sentinel
 chkconfig --add %{real_name}
+chkconfig --add %{real_name}-sentinel
 %endif
 
 
 %preun
 %if 0%{?with_systemd}
-%systemd_preun %{real_name}-sentinel.service
 %systemd_preun %{real_name}.service
+%systemd_preun %{real_name}-sentinel.service
 %else
 if [ $1 -eq 0 ] ; then
-service %{real_name}-sentinel stop &> /dev/null
-chkconfig --del %{real_name}-sentinel &> /dev/null
-service %{real_name} stop &> /dev/null
-chkconfig --del %{real_name} &> /dev/null
+    service %{real_name} stop &> /dev/null
+    chkconfig --del %{real_name} &> /dev/null
+    service %{real_name}-sentinel stop &> /dev/null
+    chkconfig --del %{real_name}-sentinel &> /dev/null
 fi
 %endif
 
 
 %postun
 %if 0%{?with_systemd}
-%systemd_postun_with_restart %{real_name}-sentinel.service
 %systemd_postun_with_restart %{real_name}.service
+%systemd_postun_with_restart %{real_name}-sentinel.service
 %else
 if [ "$1" -ge "1" ] ; then
-    service %{real_name}-sentinel condrestart >/dev/null 2>&1 || :
     service %{real_name} condrestart >/dev/null 2>&1 || :
+    service %{real_name}-sentinel condrestart >/dev/null 2>&1 || :
 fi
 %endif
 
@@ -248,11 +250,11 @@ fi
 %{_bindir}/%{real_name}-*
 %if 0%{?with_systemd}
 %{_tmpfilesdir}/%{real_name}.conf
-%{_unitdir}/%{real_name}-sentinel.service
 %{_unitdir}/%{real_name}.service
+%{_unitdir}/%{real_name}-sentinel.service
 %else
-%{_initrddir}/%{real_name}-sentinel
 %{_initrddir}/%{real_name}
+%{_initrddir}/%{real_name}-sentinel
 %endif
 
 
