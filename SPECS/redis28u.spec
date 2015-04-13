@@ -1,13 +1,6 @@
 %global real_name redis
 %global ius_suffix 28u
 
-# redis 2.8 sentinel is the first upstream version to work
-# however as packaged here it is entirely broken
-# FIXME: consider removal into a separate package
-%if 0%{?rhel} >= 7
-%global with_sentinel 1
-%endif
-
 %if 0%{?rhel} >= 7
 %global with_systemd 1
 %else
@@ -163,22 +156,16 @@ export LINKCC=gcc44
 
 # Install configuration files.
 %{__install} -pDm644 %{real_name}.conf %{buildroot}%{_sysconfdir}/%{real_name}.conf
-%if 0%{?with_sentinel}
 %{__install} -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/%{real_name}-sentinel.conf
-%endif
 
 # Install Systemd/SysV files.
 %if 0%{?with_systemd}
 %{__mkdir} -p %{buildroot}%{_unitdir}
 %{__install} -pm644 %{S:3} %{buildroot}%{_unitdir}
-%if 0%{?with_sentinel}
 %{__install} -pm644 %{S:2} %{buildroot}%{_unitdir}
-%endif
 %{__install} -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/%{real_name}.conf
 %else
-%if 0%{?with_sentinel}
 %{__install} -pDm755 %{S:5} %{buildroot}%{_initrddir}/%{real_name}-sentinel
-%endif
 %{__install} -pDm755 %{S:6} %{buildroot}%{_initrddir}/%{real_name}
 %endif
 
@@ -200,9 +187,7 @@ install -pDm755 %{S:7} %{buildroot}%{_bindir}/%{real_name}-shutdown
 %check
 %if 0%{?with_tests}
 %{__make} test
-%if 0%{?with_sentinel}
 %{__make} test-sentinel
-%endif
 %endif
 
 
@@ -217,30 +202,22 @@ exit 0
 
 %post
 %if 0%{?with_systemd}
-%if 0%{?with_sentinel}
 %systemd_post %{real_name}-sentinel.service
-%endif
 %systemd_post %{real_name}.service
 %else
-%if 0%{?with_sentinel}
 chkconfig --add %{real_name}-sentinel
-%endif
 chkconfig --add %{real_name}
 %endif
 
 
 %preun
 %if 0%{?with_systemd}
-%if 0%{?with_sentinel}
 %systemd_preun %{real_name}-sentinel.service
-%endif
 %systemd_preun %{real_name}.service
 %else
 if [ $1 -eq 0 ] ; then
-%if 0%{?with_sentinel}
 service %{real_name}-sentinel stop &> /dev/null
 chkconfig --del %{real_name}-sentinel &> /dev/null
-%endif
 service %{real_name} stop &> /dev/null
 chkconfig --del %{real_name} &> /dev/null
 fi
@@ -249,15 +226,11 @@ fi
 
 %postun
 %if 0%{?with_systemd}
-%if 0%{?with_sentinel}
 %systemd_postun_with_restart %{real_name}-sentinel.service
-%endif
 %systemd_postun_with_restart %{real_name}.service
 %else
 if [ "$1" -ge "1" ] ; then
-%if 0%{?with_sentinel}
     service %{real_name}-sentinel condrestart >/dev/null 2>&1 || :
-%endif
     service %{real_name} condrestart >/dev/null 2>&1 || :
 fi
 %endif
@@ -267,9 +240,7 @@ fi
 %doc 00-RELEASENOTES BUGS CONTRIBUTING COPYING MANIFESTO README
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{real_name}
 %config(noreplace) %{_sysconfdir}/%{real_name}.conf
-%if 0%{?with_sentinel}
 %config(noreplace) %{_sysconfdir}/%{real_name}-sentinel.conf
-%endif
 %dir %attr(0750, redis, redis) %{_sharedstatedir}/%{real_name}
 %dir %attr(0750, redis, redis) %{_localstatedir}/lib/%{real_name}
 %dir %attr(0750, redis, redis) %{_localstatedir}/log/%{real_name}
@@ -277,14 +248,10 @@ fi
 %{_bindir}/%{real_name}-*
 %if 0%{?with_systemd}
 %{_tmpfilesdir}/%{real_name}.conf
-%if 0%{?with_sentinel}
 %{_unitdir}/%{real_name}-sentinel.service
-%endif
 %{_unitdir}/%{real_name}.service
 %else
-%if 0%{?with_sentinel}
 %{_initrddir}/%{real_name}-sentinel
-%endif
 %{_initrddir}/%{real_name}
 %endif
 
