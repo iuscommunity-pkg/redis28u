@@ -282,6 +282,7 @@ fi
 - Enable sentinel
 - Increase open file limits
 - Add patch to skip replication-psync test
+- Ensure sentinel log gets rotated
 
 * Tue Dec 16 2014 Carl George <carl.george@rackspace.com> - 2.8.19-1.ius
 - Latest upstream source
