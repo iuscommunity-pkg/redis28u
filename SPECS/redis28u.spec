@@ -42,6 +42,8 @@ Source9:           %{real_name}-limit-init
 Patch0001:            0001-redis-2.8.18-redis-conf.patch
 Patch0002:            0002-redis-2.8.18-deps-library-fPIC-performance-tuning.patch
 Patch0003:            0003-redis-2.8.18-use-system-jemalloc.patch
+# tests/integration/replication-psync.tcl failed on slow machines(GITHUB #1417)
+Patch0004:            0004-redis-2.8.18-disable-test-failed-on-slow-machine.patch
 # Fix sentinel configuration to use a different log file than redis
 Patch0005:            0005-redis-2.8.18-sentinel-configuration-file-fix.patch
 
@@ -117,6 +119,7 @@ You can use Redis from most programming languages also.
 %patch0001 -p1
 %patch0002 -p1
 %patch0003 -p1
+%patch0004 -p1
 %patch0005 -p1
 
 # No hidden build.
@@ -277,6 +280,7 @@ fi
 - Enable sentinel
 - Fix #3 (/usr/com/redis)
 - Increase open file limits
+- Add patch to skip replication-psync test
 
 * Tue Dec 16 2014 Carl George <carl.george@rackspace.com> - 2.8.19-1.ius
 - Latest upstream source
