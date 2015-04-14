@@ -275,10 +275,11 @@ fi
 
 %changelog
 * Mon Apr 13 2015 Carl George <carl.george@rackspace.com> - 2.8.19-2.ius
+- Fix #3 (/usr/com/redis)
+- Remaining items are from the Fedora Project:
 - Add redis-shutdown helper script
 - Control daemonization from within service/init files
 - Enable sentinel
-- Fix #3 (/usr/com/redis)
 - Increase open file limits
 - Add patch to skip replication-psync test
 
