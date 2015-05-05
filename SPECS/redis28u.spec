@@ -22,8 +22,8 @@
 %endif
 
 Name:              %{real_name}%{ius_suffix}
-Version:           2.8.19
-Release:           2.ius%{?dist}
+Version:           2.8.20
+Release:           1.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
 License:           BSD
@@ -274,6 +274,9 @@ fi
 
 
 %changelog
+* Tue May 05 2015 Carl George <carl.george@rackspace.com> - 2.8.20-1.ius
+- Latest upstream
+
 * Mon Apr 13 2015 Carl George <carl.george@rackspace.com> - 2.8.19-2.ius
 - Fix #3 (/usr/com/redis)
 - Remaining items are from the Fedora Project:
