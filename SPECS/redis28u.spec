@@ -22,7 +22,7 @@
 %endif
 
 Name:              %{real_name}%{ius_suffix}
-Version:           2.8.23
+Version:           2.8.24
 Release:           1.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
@@ -274,6 +274,9 @@ fi
 
 
 %changelog
+* Mon Dec 21 2015 Carl George <carl.george@rackspace.com> - 2.8.24-1.ius
+- Latest upstream
+
 * Fri Oct 16 2015 Carl George <carl.george@rackspace.com> - 2.8.23-1.ius
 - Latest upstream
 
