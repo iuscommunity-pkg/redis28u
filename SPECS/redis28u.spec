@@ -23,7 +23,7 @@
 
 Name:              %{real_name}%{ius_suffix}
 Version:           2.8.24
-Release:           1.ius%{?dist}
+Release:           2.ius%{?dist}
 Summary:           A persistent caching system, key-value and data structures database
 %{?el5:Group:      Applications/Databases}
 License:           BSD
@@ -274,6 +274,9 @@ fi
 
 
 %changelog
+* Tue May 31 2016 Carl George <carl.george@rackspace.com> - 2.8.24-2.ius
+- Fix redis-shutdown to handle password-protected instances shutdown (Fedora)
+
 * Mon Dec 21 2015 Carl George <carl.george@rackspace.com> - 2.8.24-1.ius
 - Latest upstream
 
